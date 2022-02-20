@@ -7,6 +7,7 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -34,7 +35,7 @@ fun PagesSubMain(
 ) {
     val viewModel = hiltViewModel<MainViewModel>()
     val tvStatusBluetooth by viewModel.isBluetoothEnabled.observeAsState()
-    val device by viewModel.listDevice.observeAsState()
+    val device by viewModel.listDevice.observeAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
 
     val bluetoothLauncher = rememberLauncherForActivityResult(
@@ -69,7 +70,7 @@ fun PagesSubMain(
         }
     }
 
-    LaunchedEffect(key1 = rememberScaffoldState(), block = {
+    LaunchedEffect(key1 = Unit, block = {
         scope.launch {
             checkPermission()
         }
@@ -81,13 +82,11 @@ fun PagesSubMain(
             item {
                 Text(text = "$tvStatusBluetooth")
             }
-            items(device?.size ?: 0) { index ->
-                device?.let {
-                    Text(text = it[index].name)
-                } ?: kotlin.run {
-                    Text(text = "No Data")
-                }
+            items(device){
+                data->
+                Text(text = data.name)
             }
+
         })
     }
 }
